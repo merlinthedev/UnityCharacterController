@@ -6,16 +6,20 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class Movement : MonoBehaviour {
 
+    
     [SerializeField] private Rigidbody _rigidBody;
-
     [SerializeField] private PlayerInput playerInput;
     private InputAction movementAction;
 
 
-    [SerializeField]
-    private float playerMovementSmoothTime = 0.1f;
-    [SerializeField]
-    private float playerMovementSpeed = 8f;
+    [Header("Movement")]
+    [SerializeField] private float playerMovementSmoothTime = 0.1f;
+    [SerializeField] private float playerMovementSpeed = 8f;
+
+
+    [Header("Jumping")]
+    
+    
 
     private Vector2 inputVelocity;
     private Vector2 currentInputVelocity;
@@ -35,8 +39,7 @@ public class Movement : MonoBehaviour {
         Vector3 finalVelocity = new Vector3(currentInputVelocity.x, 0, currentInputVelocity.y);
 
         // Move in the direction of our rotation.
-        _rigidBody.MovePosition(_rigidBody.position + transform.forward * finalVelocity.z * playerMovementSpeed * Time.deltaTime);
-
+        _rigidBody.MovePosition(_rigidBody.position + transform.TransformDirection(finalVelocity) * playerMovementSpeed * Time.deltaTime);
     }
 
 
