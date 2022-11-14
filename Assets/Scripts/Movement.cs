@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour {
 
     
     [SerializeField] private Rigidbody _rigidBody;
+    [SerializeField] private Hoverer hoverer;
     [SerializeField] private PlayerInput playerInput;
     private InputAction movementAction;
 
@@ -18,8 +19,9 @@ public class Movement : MonoBehaviour {
 
 
     [Header("Jumping")]
-    
-    
+    [SerializeField] private float jumpForce = 24f;
+
+
 
     private Vector2 inputVelocity;
     private Vector2 currentInputVelocity;
@@ -31,6 +33,11 @@ public class Movement : MonoBehaviour {
     }
 
     private void Update() {
+        movement();
+        jumping();
+    }
+
+    private void movement() {
         // Get our vector2 from the InputSystem.
         inputVelocity = movementAction.ReadValue<Vector2>();
 
@@ -40,7 +47,17 @@ public class Movement : MonoBehaviour {
 
         // Move in the direction of our rotation.
         _rigidBody.MovePosition(_rigidBody.position + transform.TransformDirection(finalVelocity) * playerMovementSpeed * Time.deltaTime);
+
+
     }
+
+    private void jumping() {
+        // Jumping
+        if (Input.GetKeyDown(KeyCode.Space) && hoverer.IsOnGround) {
+            _rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+    
 
 
 

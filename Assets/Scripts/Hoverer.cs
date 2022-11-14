@@ -6,7 +6,7 @@ public class Hoverer : MonoBehaviour {
 
     public Rigidbody rb;
     public Vector3 groundVelocity { get; private set; } = Vector3.zero;
-    public bool isJumping = false;
+    private bool isJumping = false;
 
     [SerializeField]
     [Range(0, 2)]

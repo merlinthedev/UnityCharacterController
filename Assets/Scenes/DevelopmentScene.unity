@@ -1083,9 +1083,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidBody: {fileID: 427364441}
+  hoverer: {fileID: 427364440}
   playerInput: {fileID: 427364437}
   playerMovementSmoothTime: 0.1
   playerMovementSpeed: 8
+  jumpForce: 10.9
 --- !u!114 &427364440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1099,7 +1101,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 427364441}
-  isJumping: 0
   rideHeight: 1
 --- !u!54 &427364441
 Rigidbody:
