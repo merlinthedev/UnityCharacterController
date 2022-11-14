@@ -21,6 +21,13 @@ public class Movement : MonoBehaviour {
     [Header("Jumping")]
     [SerializeField] private float jumpForce = 24f;
 
+    [Header("Crouching")]
+    [SerializeField] private bool isCrouching = false;
+    [SerializeField] private float crouchHeight = 0.5f;
+    [SerializeField] private float crouchSpeed = 4f;
+    
+
+
 
 
     private Vector2 inputVelocity;
@@ -33,6 +40,7 @@ public class Movement : MonoBehaviour {
     }
 
     private void Update() {
+        crouching();
         movement();
         jumping();
     }
@@ -46,7 +54,7 @@ public class Movement : MonoBehaviour {
         Vector3 finalVelocity = new Vector3(currentInputVelocity.x, 0, currentInputVelocity.y);
 
         // Move in the direction of our rotation.
-        _rigidBody.MovePosition(_rigidBody.position + transform.TransformDirection(finalVelocity) * playerMovementSpeed * Time.deltaTime);
+        _rigidBody.MovePosition(_rigidBody.position + transform.TransformDirection(finalVelocity) * (isCrouching ? crouchSpeed : playerMovementSpeed) * Time.deltaTime);
 
 
     }
@@ -57,8 +65,19 @@ public class Movement : MonoBehaviour {
             _rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
-    
 
+    // Crouching
+    private void crouching() {
+        if (Input.GetKeyDown(KeyCode.LeftControl)) {
+            transform.localScale = new Vector3(transform.localScale.x, crouchHeight, transform.localScale.z);
+            isCrouching = true;
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl)) {
+            transform.localScale = new Vector3(transform.localScale.x, 1, transform.localScale.z);
+            isCrouching = false;
+        }
+    }
 
 
 
