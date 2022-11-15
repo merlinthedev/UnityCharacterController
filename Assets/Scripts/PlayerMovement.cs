@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour {
 
     public Rigidbody rb;
     public Transform orientation;
+    public Grappling grappling;
 
     float horizontalInput;
     float verticalInput;
@@ -36,6 +37,12 @@ public class PlayerMovement : MonoBehaviour {
     private bool isCrouching = false;
     public KeyCode crouchKey = KeyCode.LeftControl;
 
+    public bool isFrozen = false;
+    public bool isGrappling = false;
+
+    private Vector3 goalVelocity;
+    private bool enableMovement;
+
 
     private void Start() {
         rb.freezeRotation = true;
@@ -46,12 +53,15 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void Update() {
+        if (isFrozen) {
+            rb.velocity = Vector3.zero;
+        }
 
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.1f, groundCheck);
         keyboardInput();
         speedControl();
 
-        if (isGrounded) {
+        if (isGrounded && !isGrappling) {
             rb.drag = groundDrag;
         } else {
             rb.drag = 0;
@@ -86,6 +96,8 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void playerMovement() {
+        if (isGrappling) return;
+
         movementDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         if (isGrounded) {
@@ -108,13 +120,43 @@ public class PlayerMovement : MonoBehaviour {
 
     private void jump() {
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-
-
     }
 
     private void resetJump() {
         readyToJump = true;
+    }
+
+
+    private void setVelocity() {
+        enableMovement = true;
+        rb.velocity = goalVelocity;
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+        if (enableMovement) {
+            enableMovement = false;
+            isGrappling = false;
+
+            grappling.stopGrapple();
+        }
+    }
+
+    public void jumpToPosition(Vector3 targetPosition, float trajectoryHeight) {
+        isGrappling = true;
+        
+        goalVelocity = calculateJumpForce(transform.position, targetPosition, trajectoryHeight);
+        Invoke(nameof(setVelocity), 0.1f);
+    }
+
+    public Vector3 calculateJumpForce(Vector3 startPoint, Vector3 endPoint, float trajectoryHeight) {
+        float gravity = Physics.gravity.y;
+        float displacementY = endPoint.y - startPoint.y;
+        Vector3 displacementXZ = new Vector3(endPoint.x - startPoint.x, 0, endPoint.z - startPoint.z);
+
+        Vector3 velocityY = Vector3.up * Mathf.Sqrt(-2 * gravity * trajectoryHeight);
+        Vector3 velocityXZ = displacementXZ / (Mathf.Sqrt(-2 * trajectoryHeight / gravity) + Mathf.Sqrt(2 * (displacementY - trajectoryHeight) / gravity));
+
+        return velocityXZ + velocityY;
     }
 }
